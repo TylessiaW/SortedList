@@ -6,7 +6,7 @@ public class SortedList<T extends Comparable<? super T>> {
 
         Node(T data) {
             this.data = data;
-            next = null;
+            this.next = null;
         }
     }
 
@@ -39,8 +39,7 @@ public class SortedList<T extends Comparable<? super T>> {
         } else {
             Node current = head;
 
-            while (current.next != null &&
-                   data.compareTo(current.next.data) >= 0) {
+            while (current.next != null && data.compareTo(current.next.data) >= 0) {
                 current = current.next;
             }
 
@@ -49,24 +48,6 @@ public class SortedList<T extends Comparable<? super T>> {
         }
 
         size++;
-    }
-
-    public T get(int index) {
-        if (isEmpty()) {
-            throw new EmptyCollectionException("List is empty");
-        }
-
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        Node current = head;
-
-        for (int i = 0; i < index; i++) {
-            current = current.next;
-        }
-
-        return current.data;
     }
 
     public T removeAt(int index) {
@@ -98,8 +79,41 @@ public class SortedList<T extends Comparable<? super T>> {
         return removedData;
     }
 
-    public boolean contains(T data) {
-        return find(data) != -1;
+    public T get(int index) {
+        if (isEmpty()) {
+            throw new EmptyCollectionException("List is empty");
+        }
+
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Node current = head;
+
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+
+        return current.data;
+    }
+
+    public int count(T data) {
+        int total = 0;
+        Node current = head;
+
+        while (current != null) {
+            int compare = current.data.compareTo(data);
+
+            if (compare == 0) {
+                total++;
+            } else if (compare > 0) {
+                return total;
+            }
+
+            current = current.next;
+        }
+
+        return total;
     }
 
     public int find(T data) {
@@ -107,8 +121,12 @@ public class SortedList<T extends Comparable<? super T>> {
         int index = 0;
 
         while (current != null) {
-            if (current.data.compareTo(data) == 0) {
+            int compare = current.data.compareTo(data);
+
+            if (compare == 0) {
                 return index;
+            } else if (compare > 0) {
+                return -1;
             }
 
             current = current.next;
@@ -118,19 +136,8 @@ public class SortedList<T extends Comparable<? super T>> {
         return -1;
     }
 
-    public int count(T data) {
-        int total = 0;
-        Node current = head;
-
-        while (current != null) {
-            if (current.data.compareTo(data) == 0) {
-                total++;
-            }
-
-            current = current.next;
-        }
-
-        return total;
+    public boolean contains(T data) {
+        return find(data) != -1;
     }
 
     public void removeAll(SortedList<T> otherList) {
@@ -138,40 +145,61 @@ public class SortedList<T extends Comparable<? super T>> {
             return;
         }
 
-        Node current = head;
-        Node previous = null;
+        if (this == otherList) {
+            clear();
+            return;
+        }
 
-        while (current != null) {
-            if (otherList.contains(current.data)) {
-                if (previous == null) {
-                    head = current.next;
-                } else {
-                    previous.next = current.next;
-                }
-                size--;
+        Node currentThis = head;
+        Node previousThis = null;
+        Node currentOther = otherList.head;
+
+        while (currentThis != null && currentOther != null) {
+            int compare = currentThis.data.compareTo(currentOther.data);
+
+            if (compare < 0) {
+                previousThis = currentThis;
+                currentThis = currentThis.next;
+            } else if (compare > 0) {
+                currentOther = currentOther.next;
             } else {
-                previous = current;
-            }
+                T valueToRemove = currentThis.data;
 
-            current = current.next;
+                while (currentThis != null && currentThis.data.compareTo(valueToRemove) == 0) {
+                    currentThis = currentThis.next;
+                    size--;
+                }
+
+                if (previousThis == null) {
+                    head = currentThis;
+                } else {
+                    previousThis.next = currentThis;
+                }
+
+                while (currentOther != null && currentOther.data.compareTo(valueToRemove) == 0) {
+                    currentOther = currentOther.next;
+                }
+            }
         }
     }
 
     public String toString() {
-        String result = "[";
+        StringBuilder result = new StringBuilder();
+        result.append("[");
+
         Node current = head;
 
         while (current != null) {
-            result += current.data;
+            result.append(current.data);
 
             if (current.next != null) {
-                result += ", ";
+                result.append(", ");
             }
 
             current = current.next;
         }
 
-        result += "]";
-        return result;
+        result.append("]");
+        return result.toString();
     }
 }

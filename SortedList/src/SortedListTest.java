@@ -5,7 +5,7 @@ public class SortedListTest {
 
     public static void main(String[] args) {
 
-        System.out.println("TESTING TOSTRING WITH INTEGERS");
+        System.out.println("***** TESTING TOSTRING WITH INTEGERS *****");
         Random rand = new Random();
         SortedList<Integer> s1 = new SortedList<Integer>();
         int[] numbers = new int[10];
